@@ -1,0 +1,128 @@
+<section class="d-flex flex-column vh-100">
+    <nav class="header column-gap-5">
+        <button data-text="Awesome" class="button ">
+            <span class="actual-text">&nbsp;Chatterbox&nbsp;</span>
+            <span class="hover-text" aria-hidden="true">&nbsp;Chatterbox&nbsp;</span>
+        </button>
+        <div class="group">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+            <form [formGroup]="searchform" (ngSubmit)="searchMessage(searchform.value.query)"  class="w-100">
+                <div class="d-flex w-100 p-1 gap-3 ">
+                    <div class="group w-100">
+                        <input formControlName="query" placeholder="Search" class="input w-100" type="search">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="d-flex">
+            <div class="mt-1 ">
+                <button class="btn btn-success" routerLink="/log">Logs</button>
+            </div>
+        </div>
+        <div>
+            <button class="btn " (click)="logout()">Logout</button>
+        </div>
+    </nav>
+    <section class="d-flex overflow-auto setHeight ">
+        <div style="background-color: #E5F9DB!important;"
+            class="offcanvas-lg sticky-lg-top offcanvas-start d-lg-block col-3 overflow-auto" tabindex="-1" id="offcanvasResponsive"
+            aria-labelledby="offcanvasResponsiveLabel"aria-label="true">
+            <div class="offcanvas-header">
+                <button type="button" class="btn text-white btn-transparent" data-bs-dismiss="offcanvas"
+                    data-bs-target="#offcanvasResponsive" aria-label="Close">
+                    <i class="fa fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="d-lg-flex  flex-column offcanvas-body px-3" >
+                <div class=" my-2 title">
+                    <h5 class="">Chats</h5>
+                </div>
+                <div class="overflow-auto w-100" *ngIf="!isUserMessage">
+                    <button class="btn btn-success justify-content-end px-5 w-100 mb-2" (click)="shiftToSearch()">Close</button>
+                    <ng-container *ngFor="let msg of searchData" >
+                        <div class="card mb-2 " [ngClass]="{'receiver-message': msg.receiverId !== data.ReceiverId, 'sender-message': msg.receiverId === data.ReceiverId}">
+                        <!-- (click)="getMessage(user.userId)" -->
+                            <div class="card-body ">
+                                <!--? Usericon -->
+                                <div class="fw-bold px-2">
+                                    <span>{{msg.msgBody}}</span>
+                                    <!-- <span>{{}}</span> -->
+                                    <div *ngIf="searchData.length===0" class="messageNotFound"><p>No Message Found</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="flex-grow-1 px-2 overflow-auto" *ngIf="isUserMessage">
+                    <ng-container *ngFor="let user of list" >
+                        <div class="card mb-2 userName" (click)="getMessage(user)">
+                            <!-- (click)="getMessage(user.userId)" -->
+                            <div class="card-body d-flex">
+                                <!--? Usericon -->
+                                <div class="fw-bold text-start px-2">
+                                    <span>{{user.userName}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-column w-100    justify-content-center border border-dark border-2 rounded-2 m-1">
+            <nav class="w-100 navbar bg-light d-lg-none justify-content-between sticky-top">
+                <button class="btn btn-transparent d-lg-none " type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <span class="navbar-brand mb-0 h1">Chats</span>
+            </nav>
+            <div class="d-flex text-align align-items-center justify-content-center" *ngIf="!nameOfReceiver">
+                <h1>Welcome to Chatter<span style="color: #A2A378; ">box</span> </h1>
+            </div>
+            
+            <div class="d-lg-flex w-100  flex-column offcanvas-body  cententdiv"  id="bottomofpage" *ngIf="nameOfReceiver">
+                <div class="receiverTitle fw-bold">{{nameOfReceiver}}</div>
+                <div class="flex-grow-1 px-2 overflow-auto" >
+                    <ng-container *ngFor="let msg of msgList" >
+                        <div class="card mb-2 " (contextmenu)="onRightClick($event, msg)"
+                        [ngClass]="{'receiver-message': msg.receiverId !== data.ReceiverId, 'sender-message': msg.receiverId === data.ReceiverId}">
+                            <!-- (click)="getMessage(user.userId)" -->
+                            <div class="card-body ">
+                                <!--? Usericon -->
+                                <div class="fw-bold px-2">
+                                    <span>{{msg.msgBody}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <div style="visibility: hidden; position: fixed;"
+                [style.left.px]="menuTopLeftPosition.x"
+                [style.top.px]="menuTopLeftPosition.y"
+                [matMenuTriggerFor]="rightMenu">
+                
+            </div>
+            <mat-menu #rightMenu="matMenu" click-stop-propagation>
+                <ng-template matMenuContent let-item="item">
+                  
+                  <div>
+                    <form [formGroup]="editform"  class="d-flex">
+                        <input type="text" placeholder="Enter new message" formControlName="content" (click)="$event.stopPropagation()">
+                        <button class="btn btn-success" mat-menu-item (click)="EditMessage(item.id, editform.value.content)">Edit</button>
+                    </form>
+                  </div>
+                  <button (click)="DeleteMessage(item.id)" mat-menu-item >Delete Message</button>
+                </ng-template>
+            </mat-menu>
+            <form [formGroup]="messageform" (ngSubmit)="sendMessage()" class="w-100" *ngIf="nameOfReceiver">
+                <div class="d-flex w-100 p-1 gap-3 ">
+                    <div class="group w-100">
+                        <input formControlName="MsgBody" placeholder="Enter your Message"  class="input w-100" type="text">
+                    </div>
+                    <button class="btn btn-success justify-content-end px-5">Send</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</section>

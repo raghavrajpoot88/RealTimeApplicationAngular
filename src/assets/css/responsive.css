@@ -1,0 +1,27 @@
+/* @media (min-width: 1200px) {
+
+    .container,
+    .container-lg,
+    .container-md,
+    .container-sm,
+    .container-xl {
+        max-width: 1170px;
+    }
+} */
+
+/*------------------------------------------------------*/
+/* RESPONSIVE
+/*------------------------------------------------------*/
+@media (max-width:1320px) {}
+
+@media (max-width:1199px) {}
+
+@media (max-width:1023px) {}
+
+@media (max-width: 991px) {}
+
+/*---------- MEDIA 480px ----------*/
+@media (max-width: 767px) {}
+
+
+@media (max-width: 480px) {}

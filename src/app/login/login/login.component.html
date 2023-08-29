@@ -1,0 +1,36 @@
+<div class="containers d-flex flex-column align-item-center">
+    <div>
+        <form  [formGroup]="loginform" (ngSubmit)="onSubmitLogin(loginform.value)"  class="signup" >
+            <!--(ngSubmit)="onSubmit(registerform.value)" -->
+            <div class="">
+                
+                <div>
+                    <h3 class="heading">Login</h3>
+                    <p class="subtext">Welcome to Chating world</p>
+                </div>
+                <span style="color: red;" *ngIf="!(isregistered)">{{errorMessage}}</span>
+                <div>
+                    <label for="email" >Email</label>
+                    <input type="email" formControlName="userNameOrEmailAddress" placeholder="Enter Email Id">
+                    <div>
+                        <span style="color: red;" *ngIf="loginform.get('userNameOrEmailAddress')?.invalid && loginform.get('userNameOrEmailAddress')?.touched"> Please Enter Valid Email</span>
+                        <span style="color: lightgreen;"*ngIf="loginform.get('userNameOrEmailAddress')?.valid && loginform.get('userNameOrEmailAddress')?.touched"></span>
+                    </div>
+                </div>
+                <div>
+                    <label for="password" >Password</label>
+                    <input type="password" formControlName="password" placeholder="Enter password">
+                    <div>
+                        <span style="color: red;" *ngIf="loginform.get('password')?.invalid &&loginform.get('password')?.touched"> Please enter minimum 8 character </span>
+                        <span style="color: lightgreen;"*ngIf="loginform.get('password')?.valid && loginform.get('password')?.touched"></span>
+                    </div>
+                </div>
+                <button>Submit</button>
+                <p class="toNavigate">  <span class="">Don't have account?</span><a routerLink="../register" style="text-decoration: none;"> Sign-up</a></p>
+                <div class="googleLogin">
+                    <asl-google-signin-button   theme="filled_blue" type="standard" shape="pill" size="medium" (click)="SignInWithGoolgle()"></asl-google-signin-button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

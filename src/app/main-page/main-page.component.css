@@ -1,0 +1,28 @@
+.mainpage{
+    background-color: #E5F9DB;
+}
+button{
+    width: 40%;
+    background-color:#83764F;
+    color: white;
+    padding: 14px 20px;
+    margin: 10px auto;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+    left: auto;
+    
+
+}
+button:hover {
+    background-color: #A2A378;
+}
+.contentBody{
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 80px 10px;
+    border: #83764F 2px solid;
+    
+}

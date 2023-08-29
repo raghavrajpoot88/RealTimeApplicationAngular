@@ -1,0 +1,41 @@
+<div class="containers d-flex flex-column align-item-center">
+    <div>
+        <form  [formGroup]="registerform" (ngSubmit)="onSubmit(registerform.value)"  class="signup" >
+            <!--(ngSubmit)="onSubmit(registerform.value)" -->
+            <div class="">
+                <!-- <span>Please</span> -->
+                <div>
+                    <h3 class="heading">Registration</h3>
+                    <p class="subtext">Welcome to Chating world</p>
+                </div>
+                <div>
+                    <label for="email" >Email</label>
+                    <input type="email" formControlName="emailAddress" placeholder="Enter Email Id">
+                    <div>
+                        <span style="color: red;" *ngIf="registerform.get('Email')?.invalid && registerform.get('Email')?.touched"> Please enter email</span>
+                        <span style="color: lightgreen;"*ngIf="registerform.get('Email')?.valid && registerform.get('Email')?.touched"></span>
+                    </div>
+                </div>
+                <div>
+                    <label for="name" >Name</label>
+                    <input type="text"id="name" formControlName="userName" placeholder="Enter your name">
+                    <div>
+                        <span style="color: red;" *ngIf="registerform.get('Name')?.invalid &&registerform.get('Name')?.touched"> Please enter valid name</span>
+                        <span style="color: lightgreen;"*ngIf="registerform.get('Name')?.valid && registerform.get('Name')?.touched"></span>
+                    </div>
+                </div>
+                <div>
+                    <label for="password" >Password</label>
+                    <input type="password" formControlName="password" placeholder="Enter password">
+                    <div>
+                        <span style="color: red;" *ngIf="registerform.get('Password')?.invalid &&registerform.get('Password')?.touched"> Please enter minimum 8 character </span>
+                        <span style="color: lightgreen;"*ngIf="registerform.get('Password')?.valid && registerform.get('Password')?.touched"></span>
+                    </div>
+                </div>
+                <button *ngIf="registerform.valid">Submit</button>
+                <p class="toNavigate">  <span class="">Already have account?</span><a routerLink="../login" style="text-decoration: none;"> Log in</a></p>
+
+            </div>
+        </form>
+    </div>
+</div>
