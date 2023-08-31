@@ -26,21 +26,23 @@
     <table class="log-table">
         <thead>
             <tr>
-                <th>Log Username</th>
-                <th>Log Ip</th>
-                <th>Log traceId</th>
-                <th>Log requestBody</th>
-                <th>Log Time</th>
+                <th>Log Id</th>
+                <th>User Name</th>
+                <th>Ip Address</th>
+                <th>Action Result</th>
+                <th>Browser Detail</th>
+                <th>Time</th>
                 <!-- Add more columns if needed -->
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let log of logs">
-                <td>{{ log.username }}</td>
-                <td>{{ log.clientIp }}</td>
-                <td>{{ log.traceId }}</td>
-                <td>{{ log.requestBody }}</td>
-                <td>{{ log.requestDateTimeUtc }}</td>
+                <td>{{ log.id }}</td>
+                <td>{{log.userName}}</td>
+                <td>{{ log.clientIpAddress }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.browserInfo }}</td>
+                <td>{{ log.creationTime }}</td>
                 <!-- Add more columns if needed -->
             </tr>
         </tbody>

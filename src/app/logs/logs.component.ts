@@ -20,7 +20,6 @@ export class LogsComponent implements OnInit {
 
   requestLogs(){
     this.service.requestLogsData(this.selectedTimeInterval).subscribe(result =>{
-      console.log(result);
       this.logs=result;
       console.log(this.logs);
     })

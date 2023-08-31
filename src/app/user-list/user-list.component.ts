@@ -3,7 +3,7 @@ import { UserService } from '../services/user.service';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Location } from '@angular/common';
 
-import { userMessage, userList,sendMessage, editMessage, logs, loginInfo, tokens } from '../model/userInfo';
+import { userMessage, userList,sendMessage, editMessage, logs, loginInfo, tokens, SearchQuery } from '../model/userInfo';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 import { HttpHeaders } from '@angular/common/http';
@@ -22,12 +22,14 @@ export class UserListComponent implements OnInit {
   sentmessage:userMessage|null=null;
   searchData:userMessage[]=[];
   data:sendMessage = { ReceiverId: "", MsgBody: "" };
-
+  SearchMessage:SearchQuery={query:""};
+  
   editDeleteMessage:string="";
   isUserMessage:Boolean=true;
   nameOfReceiver:string='';
   tt !:string ;
   errorMessage:string='';
+  LoggedInUserId: string="";
   
   messageform!:FormGroup
   editform!:FormGroup
@@ -40,6 +42,7 @@ export class UserListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getList();
+    this.CurrentUser();
     this.messageform=new FormGroup({
       MsgBody:new FormControl(null,Validators.required)
     })
@@ -107,6 +110,15 @@ export class UserListComponent implements OnInit {
       this.list=list.items;
       console.log(this.list);
     })
+  }
+  //* Get Current User
+  CurrentUser(){
+    this.service.getCurrentUser().subscribe(x=>{
+      this.LoggedInUserId=x
+      console.log(this.LoggedInUserId);
+      
+    }
+      )
   }
   
   //* Get conversation history of an user.
@@ -181,6 +193,9 @@ export class UserListComponent implements OnInit {
 
   //* Search the messages.
   searchMessage(query:string){
+    this.SearchMessage.query=this.searchform.get('query')?.value;
+    console.log(this.SearchMessage);
+    
       this.isUserMessage = false;
       this.service.searchMessages(query).subscribe((result:any) =>{
       console.log(result)

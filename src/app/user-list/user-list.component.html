@@ -55,7 +55,7 @@
                 </div>
                 <div class="flex-grow-1 px-2 overflow-auto" *ngIf="isUserMessage">
                     <ng-container *ngFor="let user of list" >
-                        <div class="card mb-2 userName" (click)="getMessage(user)">
+                        <div class="card mb-2 userName" *ngIf="user.id !== LoggedInUserId && user.userName !=='admin'" (click)="getMessage(user)">
                             <!-- (click)="getMessage(user.userId)" -->
                             <div class="card-body d-flex">
                                 <!--? Usericon -->
@@ -84,7 +84,7 @@
                 <div class="receiverTitle fw-bold">{{nameOfReceiver}}</div>
                 <div class="flex-grow-1 px-2 overflow-auto" >
                     <ng-container *ngFor="let msg of msgList" >
-                        <div class="card mb-2 " (contextmenu)="onRightClick($event, msg)"
+                        <div class="card mb-2 " (contextmenu)="LoggedInUserId === msg.senderId ? onRightClick($event, msg) : null"
                         [ngClass]="{'receiver-message': msg.receiverId !== data.ReceiverId, 'sender-message': msg.receiverId === data.ReceiverId}">
                             <!-- (click)="getMessage(user.userId)" -->
                             <div class="card-body ">

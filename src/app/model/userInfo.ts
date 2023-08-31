@@ -44,13 +44,17 @@ export interface sendMessage{
 export interface editMessage{
     content:string;
 }
+export interface SearchQuery{
+    query:string;
+}
 export interface logs{
-    logId :string,
-    clientIp :string,
-    traceId :string,
-    requestBody :string,
-    requestDateTimeUtc :string,
-    username :string,
+    id: string
+    userName: string
+    clientIpAddress: string 
+    action: string
+    parameter: string
+    browserInfo: string
+    creationTime:string
 }
 export interface tokens{
     token:string

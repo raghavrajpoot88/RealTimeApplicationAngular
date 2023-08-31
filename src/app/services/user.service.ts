@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { userMessage, loginInfo, userInfo, sendMessage, editMessage, GoogleUserRequest, LoginValues } from '../model/userInfo';
+import { userMessage, loginInfo, userInfo, sendMessage, editMessage, GoogleUserRequest, LoginValues, SearchQuery } from '../model/userInfo';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
@@ -44,7 +44,7 @@ export class UserService {
       'Content-Type': 'application/x-www-form-urlencoded'
     });
     return this.http.post<any>("https://localhost:44314/connect/token",
-    "username=" + data.userNameOrEmailAddress +
+      "username=" + data.userNameOrEmailAddress +
       "&password=" + data.password +
       "&grant_type=password" +
       "&client_id=chatterBox_App&scope=openid offline_access chatterBox",{headers:header});
@@ -60,6 +60,10 @@ export class UserService {
     let header =new HttpHeaders().set("Authorization", `Bearer ${localStorage.getItem('token')}`);
     return this.http.get<any>("https://localhost:44314/api/app/user",{headers:header})
   }
+  getCurrentUser():Observable<any>{
+    let header =new HttpHeaders().set("Authorization", `Bearer ${localStorage.getItem('token')}`);
+    return this.http.get<any>("https://localhost:44314/api/app/message/current-user",{headers:header})
+  }
 
   //* Conversation history
   userMessage(data:string):Observable<any>{
@@ -73,26 +77,26 @@ export class UserService {
   }
 
   editMessage(id:string,msgbody:editMessage):Observable<any>{
-    let headers=new HttpHeaders()
+    let header=new HttpHeaders()
     .set("Authorization",`bearer ${localStorage.getItem('token')}`)
-    return this.http.put<any>(`https://localhost:44314/api/app/message/${id}`,msgbody,{headers})
+    return this.http.put<any>(`https://localhost:44314/api/app/message/${id}`,msgbody,{headers:header})
   }
 
   deleteMessage(id:string){
-    let headers=new HttpHeaders()
+    let header=new HttpHeaders()
     .set("Authorization",`bearer ${localStorage.getItem('token')}`)
-    return this.http.delete<any>(`https://localhost:44314/api/app/message/${id}`,{headers})
+    return this.http.delete<any>(`https://localhost:44314/api/app/message/${id}`,{headers:header})
   }
 
   searchMessages(query:string):Observable<any>{
-    let headers=new HttpHeaders()
+    let header=new HttpHeaders()
     .set("Authorization",`bearer ${localStorage.getItem('token')}`)
-    return this.http.get<userMessage>(`https://localhost:7174/api/MessageInfo/search?query=${query}`,{headers})
+    return this.http.get<userMessage>(`https://localhost:44314/api/app/message/search?query=${query}`,{headers:header})
   }
 
   requestLogsData(timeInterval: number){
-    let headers=new HttpHeaders()
+    let header=new HttpHeaders()
     .set("Authorization",`bearer ${localStorage.getItem('token')}`)
-    return this.http.get<any>(`https://localhost:7174/api/RequestLog?timeInterval=${timeInterval}`,{headers})
+    return this.http.get<any>(`https://localhost:44314/api/app/logs/logs?timeSpan=${timeInterval}`,{headers:header})
   }
 }
