@@ -61,7 +61,8 @@ export class UserListComponent implements OnInit {
     //?Real-time implementation
     let headers=new HttpHeaders()
     .set("Authorization",`bearer ${localStorage.getItem('token')}`)
-    this._hubConnection=new HubConnectionBuilder().withUrl('https://localhost:7174/hub',{ accessTokenFactory: () => this.tt }).build();
+    this._hubConnection=new HubConnectionBuilder().withUrl('https://localhost:44314/hub',{ accessTokenFactory: () => this.tt }).build();
+    
     this._hubConnection.start()
     .then(()=>
       console.log("Realtime connection started"))

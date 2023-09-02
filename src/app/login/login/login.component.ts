@@ -25,7 +25,7 @@ constructor(private service:UserService, private router :Router ,private authSer
     this.token.emit(this.loginList);
 
    this.loginform=new FormGroup({
-    userNameOrEmailAddress:new FormControl(null,[Validators.required,Validators.email]),
+    userNameOrEmailAddress:new FormControl(null,[Validators.required]),
     password:new FormControl(null,Validators.required)
    })
 

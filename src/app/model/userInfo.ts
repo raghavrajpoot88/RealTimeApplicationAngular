@@ -51,9 +51,7 @@ export interface logs{
     id: string
     userName: string
     clientIpAddress: string 
-    action: string
     parameter: string
-    browserInfo: string
     creationTime:string
 }
 export interface tokens{
