@@ -74,6 +74,22 @@ export class UserListComponent implements OnInit {
       this.msgList.push(data);
       console.log(data);
       console.log(this.msgList);
+    });
+
+    this._hubConnection.on('ReceiveEditMessage',(Message:userMessage)=>{
+      const editedMsgIndex = this.msgList.findIndex(msg => msg.id === Message.id);
+      if (editedMsgIndex !== -1) {
+        this.msgList[editedMsgIndex].msgBody = Message.msgBody;
+        this.msgList = [...this.msgList];
+      }
+    })
+
+    this._hubConnection.on('ReceiveDeleteMessage',(data:userMessage)=>{
+      const indexToRemove = this.msgList.findIndex(item => item.id === data.id);
+      console.log(indexToRemove);
+      if (indexToRemove !== -1) {
+        this.msgList.splice(indexToRemove, 1);
+      }
     })
   }
 
@@ -167,10 +183,13 @@ export class UserListComponent implements OnInit {
     const editMessageValue: editMessage = { content: content };
     console.log(editMessageValue);
     this.service.editMessage(msgId, editMessageValue).subscribe(result=>{
-      console.log(result)
+      console.log(result);
+
+      this._hubConnection.invoke('EditMessage', result);
+
       const editedMsgIndex = this.msgList.findIndex(msg => msg.id === msgId);
       if (editedMsgIndex !== -1) {
-        this.msgList[editedMsgIndex].msgBody = editMessageValue.content;
+        this.msgList[editedMsgIndex].msgBody = result.msgBody;
         this.msgList = [...this.msgList];
         console.log(editMessageValue.content);
       }
@@ -178,16 +197,18 @@ export class UserListComponent implements OnInit {
   } 
 
   //* Delete the message.
-  DeleteMessage(msgId:string){
+  DeleteMessage(msg:userMessage){
     this.service.deleteMessage(this.editDeleteMessage).subscribe(result=>{
       console.log(result)
       if(!result){
         this.errorMessage='Some error, Please Try again.'
       }
-      const indexToRemove = this.msgList.findIndex(item => item.id === msgId);
+      this._hubConnection.invoke('DeleteMessage', msg);
+
+      const indexToRemove = this.msgList.findIndex(item => item.id === msg.id);
       console.log(indexToRemove);
       if (indexToRemove !== -1) {
-        this.msgList.splice(indexToRemove, 1);
+        this.msgList.splice(indexToRemove, 1); 
       }
     })
   }

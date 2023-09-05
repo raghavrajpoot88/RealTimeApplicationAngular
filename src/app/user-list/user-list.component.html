@@ -112,7 +112,7 @@
                         <button class="btn btn-success" mat-menu-item (click)="EditMessage(item.id, editform.value.content)">Edit</button>
                     </form>
                   </div>
-                  <button (click)="DeleteMessage(item.id)" mat-menu-item >Delete Message</button>
+                  <button (click)="DeleteMessage(item)" mat-menu-item >Delete Message</button>
                 </ng-template>
             </mat-menu>
             <form [formGroup]="messageform" (ngSubmit)="sendMessage()" class="w-100" *ngIf="nameOfReceiver">
