@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { UserService } from '../services/user.service';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Location } from '@angular/common';
@@ -15,8 +15,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent implements OnInit {
-  @ViewChild('bottomOfPage', { static: true }) bottomOfPageRef!: ElementRef;
-  
   list:userList[]=[];
   msgList:userMessage[]=[];
   sentmessage:userMessage|null=null;
@@ -25,11 +23,13 @@ export class UserListComponent implements OnInit {
   SearchMessage:SearchQuery={query:""};
   
   editDeleteMessage:string="";
-  isUserMessage:Boolean=true;
   nameOfReceiver:string='';
   tt !:string ;
   errorMessage:string='';
   LoggedInUserId: string="";
+  timeOfFirstMessage:string="";
+  isUserMessage:Boolean=true;
+  checkLoader:Boolean=false;
   
   messageform!:FormGroup
   editform!:FormGroup
@@ -38,11 +38,14 @@ export class UserListComponent implements OnInit {
   private _hubConnection!: HubConnection
   public connectionId!: string;
 
-  constructor(private service:UserService , private router:Router, private location:Location){}
-
+  constructor(private service:UserService , private router:Router){}
   ngOnInit(): void {
     this.getList();
     this.CurrentUser();
+    
+
+    
+
     this.messageform=new FormGroup({
       MsgBody:new FormControl(null,Validators.required)
     })
@@ -110,15 +113,11 @@ export class UserListComponent implements OnInit {
         this._hubConnection.invoke('NewMessage', result);
 
         this.messageform.reset();
-        this.scrollToBottom();
+        // this.scrollToBottom();
       })
+      this.bottom();
   }
-  private scrollToBottom() {
-    if (this.bottomOfPageRef && this.bottomOfPageRef.nativeElement) {
-      this.bottomOfPageRef.nativeElement.scrollIntoView({ behavior: 'smooth' });
-    }
-    console.log("Scrolling to the bottom");
-  }
+  
 
   //* Get the User list.
   getList(){
@@ -140,19 +139,71 @@ export class UserListComponent implements OnInit {
   
   //* Get conversation history of an user.
   getMessage(data:userList){
-    this.location.replaceState(`/chat/user/${data.id}`);
+    // this.location.replaceState(`/chat/user/${data.id}`);
     this.isUserMessage=true;
     console.log(localStorage.getItem('token'));
     
     this.service.userMessage(data.id).subscribe(result=>{
+     
       this.msgList=result;
+      console.log(result);
       this.data.ReceiverId=data.id;
       
-      console.log(result);
+      
       this.nameOfReceiver=data.userName;
       console.log(data.userName);
       this.sentmessage=null;
-    })
+        
+      this.bottom();
+      this.checkLoader=false;
+    });
+  }
+
+  
+ 
+  olderMessage(event:Event):void{
+      const scrollableDiv = document.querySelector('.scrollableDiv');
+      // if (scrollableDiv) {     
+        if (scrollableDiv!.scrollTop === 0) {
+          this.checkLoader=true;
+          setTimeout(()=>{
+            this.service.loadUserMessage( this.data.ReceiverId, this.msgList[0].timeStamp).subscribe((result) => {
+                console.log(result);
+                // this.msgList=result.concat(this.msgList);
+                if (result.length === 0|| result.error) {
+                    this.checkLoader = false;
+                }
+                if (result.length > 0) {
+                  // Append the new messages to the beginning of msgList
+                  this.msgList = [...result, ...this.msgList];
+                }
+              });
+              this.checkLoader=false;
+          },2000);
+        // }
+    }
+  }
+    
+  private bottom():void{
+    // try {
+    //   if (this.scrollableDiv && this.scrollableDiv.nativeElement) {
+    //     this.scrollableDiv.nativeElement.scrollTop = this.scrollableDiv.nativeElement.scrollHeight;
+    //     console.log(this.scrollableDiv.nativeElement.scrollHeight);
+        
+    //   }
+    // } catch (error) {
+    //   console.error("Error scrolling to bottom:", error);
+    // }
+    setTimeout(()=>{
+      const scrollableDiv = document.querySelector('.scrollableDiv');
+  
+        // Access the scroll height of the scrollableDiv
+        if(scrollableDiv){
+        // scrollableDiv.scrollTop = scrollableDiv.scrollHeight;
+        scrollableDiv.scroll({ top: scrollableDiv.scrollHeight, behavior: 'smooth' });
+        console.log('Scroll height:', scrollableDiv.scrollHeight);
+        }
+      },100)
   }
 
   //* create a div at coorddiante on right click.
@@ -220,8 +271,8 @@ export class UserListComponent implements OnInit {
     
       this.isUserMessage = false;
       this.service.searchMessages(query).subscribe((result:any) =>{
-      console.log(result)
-      this.searchData=result
+      console.log(result);
+      this.searchData=result;
       console.log(this.searchData);
     })
   }
@@ -236,8 +287,8 @@ export class UserListComponent implements OnInit {
   }
   logout(){
     this.service.logout().subscribe((result)=>{
-      console.log(result)
-      this.router.navigate(["/login"])
+      console.log(result);
+      this.router.navigate(["/login"]);
     });
   }
 }

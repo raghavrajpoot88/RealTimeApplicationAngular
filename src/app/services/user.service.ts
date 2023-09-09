@@ -82,6 +82,10 @@ export class UserService {
     let header=new HttpHeaders().set("Authorization", `Bearer ${localStorage.getItem('token')}`);
     return this.http.get<any>(`https://localhost:44359/api/app/message/messages/${data}?count=${20}&sort=asc`,{headers:header})
   }
+  loadUserMessage(data:string,time:string):Observable<any>{
+    let header=new HttpHeaders().set("Authorization", `Bearer ${localStorage.getItem('token')}`);
+    return this.http.get<any>(`https://localhost:44359/api/app/message/messages/${data}?before=${time}&count=${20}&sort=asc`,{headers:header})
+  }
   
   sendMessage(data:sendMessage):Observable<any>{
     let header=new HttpHeaders().set("Authorization", `Bearer ${localStorage.getItem('token')}`);
