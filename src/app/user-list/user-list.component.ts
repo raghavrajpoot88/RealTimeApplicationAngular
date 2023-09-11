@@ -17,7 +17,6 @@ import { Router } from '@angular/router';
 export class UserListComponent implements OnInit {
   list:userList[]=[];
   msgList:userMessage[]=[];
-  sentmessage:userMessage|null=null;
   searchData:userMessage[]=[];
   data:sendMessage = { ReceiverId: "", MsgBody: "" };
   SearchMessage:SearchQuery={query:""};
@@ -27,7 +26,6 @@ export class UserListComponent implements OnInit {
   tt !:string ;
   errorMessage:string='';
   LoggedInUserId: string="";
-  timeOfFirstMessage:string="";
   isUserMessage:Boolean=true;
   checkLoader:Boolean=false;
   
@@ -36,15 +34,11 @@ export class UserListComponent implements OnInit {
   searchform!:FormGroup
 
   private _hubConnection!: HubConnection
-  public connectionId!: string;
 
-  constructor(private service:UserService , private router:Router){}
+  constructor(private service:UserService , private router:Router, private location: Location){}
   ngOnInit(): void {
     this.getList();
     this.CurrentUser();
-    
-
-    
 
     this.messageform=new FormGroup({
       MsgBody:new FormControl(null,Validators.required)
@@ -78,7 +72,7 @@ export class UserListComponent implements OnInit {
       console.log(data);
       console.log(this.msgList);
     });
-
+    // Real time edit message
     this._hubConnection.on('ReceiveEditMessage',(Message:userMessage)=>{
       const editedMsgIndex = this.msgList.findIndex(msg => msg.id === Message.id);
       if (editedMsgIndex !== -1) {
@@ -86,7 +80,7 @@ export class UserListComponent implements OnInit {
         this.msgList = [...this.msgList];
       }
     })
-
+    // Real time message delete
     this._hubConnection.on('ReceiveDeleteMessage',(data:userMessage)=>{
       const indexToRemove = this.msgList.findIndex(item => item.id === data.id);
       console.log(indexToRemove);
@@ -107,13 +101,8 @@ export class UserListComponent implements OnInit {
           this.msgList.splice(0, this.msgList.length - 20);
         }
         console.log(this.msgList); 
-        
-        //! this._hubConnection.invoke('ReceiveMessage',this.connectionId, result);
-        //! Hub connection
         this._hubConnection.invoke('NewMessage', result);
-
         this.messageform.reset();
-        // this.scrollToBottom();
       })
       this.bottom();
   }
@@ -131,75 +120,54 @@ export class UserListComponent implements OnInit {
   CurrentUser(){
     this.service.getCurrentUser().subscribe(x=>{
       this.LoggedInUserId=x
-      console.log(this.LoggedInUserId);
-      
-    }
-      )
+      console.log(this.LoggedInUserId); 
+    })
   }
   
   //* Get conversation history of an user.
   getMessage(data:userList){
-    // this.location.replaceState(`/chat/user/${data.id}`);
+    this.location.replaceState(`/chat/user/${data.id}`);
     this.isUserMessage=true;
-    console.log(localStorage.getItem('token'));
-    
     this.service.userMessage(data.id).subscribe(result=>{
-     
       this.msgList=result;
       console.log(result);
       this.data.ReceiverId=data.id;
-      
-      
       this.nameOfReceiver=data.userName;
       console.log(data.userName);
-      this.sentmessage=null;
-        
       this.bottom();
       this.checkLoader=false;
     });
   }
 
   
- 
+ // Load More message on scroll.
   olderMessage(event:Event):void{
-      const scrollableDiv = document.querySelector('.scrollableDiv');
-      // if (scrollableDiv) {     
-        if (scrollableDiv!.scrollTop === 0) {
+    const scrollableDiv = document.querySelector('.scrollableDiv');
+    if (scrollableDiv) {     
+        if (scrollableDiv!.scrollTop === 0 && this.msgList.length> 0) {
           this.checkLoader=true;
           setTimeout(()=>{
             this.service.loadUserMessage( this.data.ReceiverId, this.msgList[0].timeStamp).subscribe((result) => {
                 console.log(result);
-                // this.msgList=result.concat(this.msgList);
-                if (result.length === 0|| result.error) {
+                if (result.length === 0) {
                     this.checkLoader = false;
+                    alert("No more Message");
                 }
                 if (result.length > 0) {
-                  // Append the new messages to the beginning of msgList
                   this.msgList = [...result, ...this.msgList];
                 }
               });
               this.checkLoader=false;
           },2000);
-        // }
+        
+      }
     }
   }
-    
+  // Scroll to bottom.
   private bottom():void{
-    // try {
-    //   if (this.scrollableDiv && this.scrollableDiv.nativeElement) {
-    //     this.scrollableDiv.nativeElement.scrollTop = this.scrollableDiv.nativeElement.scrollHeight;
-    //     console.log(this.scrollableDiv.nativeElement.scrollHeight);
-        
-    //   }
-    // } catch (error) {
-    //   console.error("Error scrolling to bottom:", error);
-    // }
     setTimeout(()=>{
       const scrollableDiv = document.querySelector('.scrollableDiv');
-  
-        // Access the scroll height of the scrollableDiv
         if(scrollableDiv){
-        // scrollableDiv.scrollTop = scrollableDiv.scrollHeight;
         scrollableDiv.scroll({ top: scrollableDiv.scrollHeight, behavior: 'smooth' });
         console.log('Scroll height:', scrollableDiv.scrollHeight);
         }
@@ -235,9 +203,7 @@ export class UserListComponent implements OnInit {
     console.log(editMessageValue);
     this.service.editMessage(msgId, editMessageValue).subscribe(result=>{
       console.log(result);
-
       this._hubConnection.invoke('EditMessage', result);
-
       const editedMsgIndex = this.msgList.findIndex(msg => msg.id === msgId);
       if (editedMsgIndex !== -1) {
         this.msgList[editedMsgIndex].msgBody = result.msgBody;
@@ -274,6 +240,9 @@ export class UserListComponent implements OnInit {
       console.log(result);
       this.searchData=result;
       console.log(this.searchData);
+      setTimeout(() => {
+        this.searchform.reset();
+      }, 500);
     })
   }
 
