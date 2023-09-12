@@ -11,7 +11,7 @@
                 <span style="color: red;" *ngIf="!(isregistered)">{{errorMessage}}</span>
                 <div>
                     <label for="email" >Email</label>
-                    <input type="email" formControlName="userNameOrEmailAddress" placeholder="Enter Email Id">
+                    <input type="email" formControlName="userNameOrEmailAddress" id="email" placeholder="Enter Email Id">
                     <div>
                         <span style="color: red;" *ngIf="loginform.get('userNameOrEmailAddress')?.invalid && loginform.get('userNameOrEmailAddress')?.touched"> Please Enter Valid Email</span>
                         <span style="color: lightgreen;"*ngIf="loginform.get('userNameOrEmailAddress')?.valid && loginform.get('userNameOrEmailAddress')?.touched"></span>
@@ -19,7 +19,7 @@
                 </div>
                 <div>
                     <label for="password" >Password</label>
-                    <input type="password" formControlName="password" placeholder="Enter password">
+                    <input type="password" formControlName="password" id="password" placeholder="Enter password">
                     <div>
                         <span style="color: red;" *ngIf="loginform.get('password')?.invalid &&loginform.get('password')?.touched"> Please enter minimum 8 character </span>
                         <span style="color: lightgreen;"*ngIf="loginform.get('password')?.valid && loginform.get('password')?.touched"></span>

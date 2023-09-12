@@ -28,12 +28,15 @@ export class UserListComponent implements OnInit {
   LoggedInUserId: string="";
   isUserMessage:Boolean=true;
   checkLoader:Boolean=false;
+  scrollToBottomEnabled: boolean = true; 
+
   
   messageform!:FormGroup
   editform!:FormGroup
   searchform!:FormGroup
 
   private _hubConnection!: HubConnection
+  previousScrollTop!: number;
 
   constructor(private service:UserService , private router:Router, private location: Location){}
   ngOnInit(): void {
@@ -126,7 +129,7 @@ export class UserListComponent implements OnInit {
   
   //* Get conversation history of an user.
   getMessage(data:userList){
-    this.location.replaceState(`/chat/user/${data.id}`);
+    //this.location.replaceState(`/chat/user/${data.id}`);
     this.isUserMessage=true;
     this.service.userMessage(data.id).subscribe(result=>{
       this.msgList=result;
@@ -146,6 +149,7 @@ export class UserListComponent implements OnInit {
     if (scrollableDiv) {     
         if (scrollableDiv!.scrollTop === 0 && this.msgList.length> 0) {
           this.checkLoader=true;
+          this.scrollToBottomEnabled = false;
           setTimeout(()=>{
             this.service.loadUserMessage( this.data.ReceiverId, this.msgList[0].timeStamp).subscribe((result) => {
                 console.log(result);
@@ -156,6 +160,8 @@ export class UserListComponent implements OnInit {
                 if (result.length > 0) {
                   this.msgList = [...result, ...this.msgList];
                 }
+                scrollableDiv.scrollTop = this.previousScrollTop;
+                this.scrollToBottomEnabled = true;
               });
               this.checkLoader=false;
           },2000);
@@ -167,7 +173,10 @@ export class UserListComponent implements OnInit {
   private bottom():void{
     setTimeout(()=>{
       const scrollableDiv = document.querySelector('.scrollableDiv');
-        if(scrollableDiv){
+        if(scrollableDiv && this.scrollToBottomEnabled){
+          this.previousScrollTop = scrollableDiv.scrollTop;
+          console.log(this.previousScrollTop);
+          
         scrollableDiv.scroll({ top: scrollableDiv.scrollHeight, behavior: 'smooth' });
         console.log('Scroll height:', scrollableDiv.scrollHeight);
         }
